@@ -1,0 +1,51 @@
+1. Apa saja mata kuliah wajib untuk semester 1?
+2. Apa saja mata kuliah pilihan untuk semester 1?
+3. Apa saja mata kuliah wajib untuk semester 2?
+4. Apa saja mata kuliah pilihan untuk semester 2?
+5. Apa saja mata kuliah wajib untuk semester 3?
+6. Apa saja mata kuliah pilihan untuk semester 3?
+7. Apa saja mata kuliah wajib untuk semester 4?
+8. Apa saja mata kuliah pilihan untuk semester 4?
+9. Apa saja mata kuliah wajib untuk semester 5?
+10. Apa saja mata kuliah pilihan untuk semester 5?
+11. Apa saja mata kuliah wajib untuk semester 6?
+12. Apa saja mata kuliah pilihan untuk semester 6?
+13. Apa saja mata kuliah wajib untuk semester 7?
+14. Apa saja mata kuliah pilihan untuk semester 7?
+15. Apa saja mata kuliah wajib untuk semester 8?
+16. Apa saja mata kuliah pilihan untuk semester 8?
+17. Mata kuliah Pengantar Sains Data mengajarkan tentang apa?
+18. Mata kuliah Pemrograman R mengajarkan tentang apa?
+19. Mata kuliah Pemrograman Python mengajarkan tentang apa?
+20. Mata kuliah Machine Learning mengajarkan tentang apa?
+21. Mata kuliah Big Data mengajarkan tentang apa?
+22. Mata kuliah Visualisasi Data mengajarkan tentang apa?
+23. Mata kuliah Data Mining mengajarkan tentang apa?
+24. Mata kuliah Deep Learning mengajarkan tentang apa?
+25. Mata kuliah Statistika mengajarkan tentang apa?
+26. Mata kuliah Matematika Diskrit mengajarkan tentang apa?
+27. Mata kuliah Algoritma dan Struktur Data mengajarkan tentang apa?
+28. Mata kuliah Sistem Basis Data mengajarkan tentang apa?
+29. Mata kuliah Kecerdasan Buatan mengajarkan tentang apa?
+30. Mata kuliah Analisis Data Multivariat mengajarkan tentang apa?
+31. Apakah saya mending mengambil PKL atau KKN untuk semester depan? (SKSnya harus mencukupi)
+32. Apa perbedaan antara PKL dan KKN?
+33. Berapa SKS minimal untuk mengambil PKL?
+34. Berapa SKS minimal untuk mengambil KKN?
+35. Kapan pelaksanaan PKL biasanya dilakukan?
+36. Kapan pelaksanaan KKN biasanya dilakukan?
+37. Apakah PKL wajib bagi mahasiswa Teknologi Sains Data?
+38. Apakah KKN wajib bagi mahasiswa Teknologi Sains Data?
+39. Apa syarat kelulusan program studi ini?
+40. Berapa total SKS yang harus ditempuh?
+41. Bagaimana prosedur pendaftaran skripsi?
+42. Apa saja topik penelitian yang disarankan?
+43. Siapa koordinator program studi saat ini?
+44. Apa saja profil lulusan Teknologi Sains Data?
+45. Bagaimana cara mengajukan cuti akademik?
+46. Apa saja fasilitas yang tersedia untuk mahasiswa?
+47. Apakah ada program pertukaran pelajar?
+48. Bagaimana sistem penilaian di program studi ini?
+49. Apa saja mata kuliah prasyarat untuk Skripsi?
+50. Bagaimana cara menghubungi dosen wali?
+

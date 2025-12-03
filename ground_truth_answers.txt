@@ -1,0 +1,150 @@
+1. Apa saja mata kuliah wajib untuk semester 1?
+Jawaban: Mata kuliah wajib Semester 1 meliputi: Kalkulus 1, Fisika Dasar 1, Kimia Dasar 1, Pengantar Teknologi Sains Data, Algoritma dan Pemrograman, Bahasa Inggris, dan Agama.
+
+2. Apa saja mata kuliah pilihan untuk semester 1?
+Jawaban: Pada semester 1 belum ada mata kuliah pilihan, semua mahasiswa wajib mengambil paket mata kuliah dasar.
+
+3. Apa saja mata kuliah wajib untuk semester 2?
+Jawaban: Mata kuliah wajib Semester 2 meliputi: Kalkulus 2, Fisika Dasar 2, Aljabar Linier Elementer, Statistika Dasar, Struktur Data, dan Pancasila.
+
+4. Apa saja mata kuliah pilihan untuk semester 2?
+Jawaban: Semester 2 masih fokus pada mata kuliah wajib dasar dan belum ada mata kuliah pilihan.
+
+5. Apa saja mata kuliah wajib untuk semester 3?
+Jawaban: Mata kuliah wajib Semester 3 meliputi: Matematika Diskrit, Probabilitas dan Stokastik, Basis Data, Pemrograman Berorientasi Objek, dan Metode Numerik.
+
+6. Apa saja mata kuliah pilihan untuk semester 3?
+Jawaban: Belum ada mata kuliah pilihan di semester 3.
+
+7. Apa saja mata kuliah wajib untuk semester 4?
+Jawaban: Mata kuliah wajib Semester 4 meliputi: Analisis Regresi, Kecerdasan Buatan, Desain dan Analisis Algoritma, Sistem Operasi, dan Pengolahan Sinyal Digital.
+
+8. Apa saja mata kuliah pilihan untuk semester 4?
+Jawaban: Mahasiswa mulai dapat mengambil mata kuliah pilihan sesuai minat, seperti Pengantar Bioinformatika atau Sistem Informasi Geografis (tergantung ketersediaan).
+
+9. Apa saja mata kuliah wajib untuk semester 5?
+Jawaban: Mata kuliah wajib Semester 5 meliputi: Machine Learning, Penambangan Data (Data Mining), Analisis Multivariat, dan Metodologi Penelitian.
+
+10. Apa saja mata kuliah pilihan untuk semester 5?
+Jawaban: Mata kuliah pilihan Semester 5 meliputi: Pengolahan Citra Digital, Analisis Deret Waktu, dan Sistem Temu Kembali Informasi.
+
+11. Apa saja mata kuliah wajib untuk semester 6?
+Jawaban: Mata kuliah wajib Semester 6 meliputi: Deep Learning, Big Data Analytics, Visualisasi Data, dan Kerja Praktik (PKL).
+
+12. Apa saja mata kuliah pilihan untuk semester 6?
+Jawaban: Mata kuliah pilihan Semester 6 meliputi: Natural Language Processing (NLP), Analisis Jejaring Sosial, dan Komputasi Awan.
+
+13. Apa saja mata kuliah wajib untuk semester 7?
+Jawaban: Mata kuliah wajib Semester 7 meliputi: Kuliah Kerja Nyata (KKN) dan Proposal Skripsi.
+
+14. Apa saja mata kuliah pilihan untuk semester 7?
+Jawaban: Mata kuliah pilihan Semester 7 meliputi: Sistem Rekomendasi, Robotika Cerdas, dan Etika Data.
+
+15. Apa saja mata kuliah wajib untuk semester 8?
+Jawaban: Mata kuliah wajib Semester 8 adalah Skripsi (Tugas Akhir).
+
+16. Apa saja mata kuliah pilihan untuk semester 8?
+Jawaban: Biasanya semester 8 fokus sepenuhnya pada Skripsi, namun jika SKS kurang, mahasiswa bisa mengambil ulang mata kuliah pilihan semester genap sebelumnya.
+
+17. Mata kuliah Pengantar Sains Data mengajarkan tentang apa?
+Jawaban: Mata kuliah ini memberikan gambaran umum tentang siklus hidup data, mulai dari pengumpulan, pembersihan, eksplorasi, hingga pemodelan dasar dan visualisasi data, serta penerapannya di berbagai industri.
+
+18. Mata kuliah Pemrograman R mengajarkan tentang apa?
+Jawaban: Mengajarkan dasar-dasar bahasa pemrograman R, manipulasi data frame, analisis statistik menggunakan R, dan pembuatan grafik dasar.
+
+19. Mata kuliah Pemrograman Python mengajarkan tentang apa?
+Jawaban: Mengajarkan sintaks dasar Python, struktur data (list, dict, tuple), fungsi, serta library populer untuk data science seperti NumPy, Pandas, dan Matplotlib.
+
+20. Mata kuliah Machine Learning mengajarkan tentang apa?
+Jawaban: Mempelajari algoritma pembelajaran mesin seperti Supervised Learning (Regresi, Klasifikasi) dan Unsupervised Learning (Clustering), serta evaluasi model.
+
+21. Mata kuliah Big Data mengajarkan tentang apa?
+Jawaban: Fokus pada teknologi untuk memproses data berskala besar yang tidak bisa ditangani komputer biasa, menggunakan framework seperti Hadoop dan Spark.
+
+22. Mata kuliah Visualisasi Data mengajarkan tentang apa?
+Jawaban: Teknik menyajikan data dalam bentuk grafis yang komunikatif dan estetik menggunakan tools seperti Tableau, Power BI, atau library Python (Seaborn/Plotly).
+
+23. Mata kuliah Data Mining mengajarkan tentang apa?
+Jawaban: Proses penggalian pola-pola tersembunyi dari data dalam jumlah besar menggunakan teknik statistik, matematika, dan kecerdasan buatan.
+
+24. Mata kuliah Deep Learning mengajarkan tentang apa?
+Jawaban: Cabang lanjutan Machine Learning yang menggunakan Jaringan Syaraf Tiruan (Neural Networks) berlapis banyak untuk tugas kompleks seperti pengenalan gambar dan suara.
+
+25. Mata kuliah Statistika mengajarkan tentang apa?
+Jawaban: Konsep dasar pengumpulan data, ukuran pemusatan (mean, median), penyebaran data, uji hipotesis, dan inferensi statistik.
+
+26. Mata kuliah Matematika Diskrit mengajarkan tentang apa?
+Jawaban: Struktur matematika yang tidak kontinu, seperti logika, himpunan, relasi, graf, dan kombinatorika yang menjadi dasar ilmu komputer.
+
+27. Mata kuliah Algoritma dan Struktur Data mengajarkan tentang apa?
+Jawaban: Cara menyimpan dan mengatur data secara efisien (stack, queue, tree, graph) serta algoritma untuk memanipulasinya (sorting, searching).
+
+28. Mata kuliah Sistem Basis Data mengajarkan tentang apa?
+Jawaban: Perancangan database (ERD), normalisasi, dan penggunaan bahasa query (SQL) untuk mengelola data dalam sistem manajemen basis data (DBMS).
+
+29. Mata kuliah Kecerdasan Buatan mengajarkan tentang apa?
+Jawaban: Konsep dasar AI, agen cerdas, pencarian ruang keadaan (state space search), logika fuzzy, dan sistem pakar.
+
+30. Mata kuliah Analisis Data Multivariat mengajarkan tentang apa?
+Jawaban: Teknik statistik untuk menganalisis data yang melibatkan lebih dari satu variabel sekaligus, seperti PCA (Principal Component Analysis) dan Analisis Faktor.
+
+31. Apakah saya mending mengambil PKL atau KKN untuk semester depan? (SKSnya harus mencukupi)
+Jawaban: PKL dan KKN memiliki tujuan berbeda. PKL (Praktik Kerja Lapangan) fokus pada pengalaman kerja profesional di industri sesuai bidang studi, biasanya diambil di semester 6. KKN (Kuliah Kerja Nyata) fokus pada pengabdian masyarakat interdisipliner, biasanya di semester 7. Pastikan SKS Anda sudah mencukupi syarat minimal (biasanya >90 SKS untuk PKL dan >100 SKS untuk KKN).
+
+32. Apa perbedaan antara PKL dan KKN?
+Jawaban: PKL bersifat individu/kelompok kecil di perusahaan/instansi untuk menerapkan skill teknis prodi. KKN bersifat kelompok besar campur antar-fakultas di desa/masyarakat untuk memecahkan masalah sosial umum.
+
+33. Berapa SKS minimal untuk mengambil PKL?
+Jawaban: Syarat minimal mengambil PKL biasanya adalah telah menempuh minimal 80-90 SKS dengan IPK minimal 2.00 (cek pedoman terbaru prodi untuk angka pastinya).
+
+34. Berapa SKS minimal untuk mengambil KKN?
+Jawaban: Syarat minimal mengambil KKN biasanya adalah telah menempuh minimal 100-110 SKS.
+
+35. Kapan pelaksanaan PKL biasanya dilakukan?
+Jawaban: PKL biasanya dilaksanakan pada libur semester antara semester 6 dan 7, atau selama semester 6 jika kurikulum merdeka (MBKM).
+
+36. Kapan pelaksanaan KKN biasanya dilakukan?
+Jawaban: KKN reguler biasanya dilaksanakan pada libur semester antara semester 6 dan 7, atau semester 7 dan 8.
+
+37. Apakah PKL wajib bagi mahasiswa Teknologi Sains Data?
+Jawaban: Ya, PKL adalah mata kuliah wajib untuk memberikan pengalaman industri kepada mahasiswa.
+
+38. Apakah KKN wajib bagi mahasiswa Teknologi Sains Data?
+Jawaban: Ya, KKN adalah mata kuliah wajib universitas yang harus diambil seluruh mahasiswa Unair sebagai bentuk pengabdian masyarakat.
+
+39. Apa syarat kelulusan program studi ini?
+Jawaban: Menyelesaikan seluruh mata kuliah wajib dan pilihan dengan total minimal 144 SKS, IPK minimal 2.00, nilai D maksimal 10% dari total SKS, tidak ada nilai E, serta lulus sidang Skripsi.
+
+40. Berapa total SKS yang harus ditempuh?
+Jawaban: Minimal 144 SKS.
+
+41. Bagaimana prosedur pendaftaran skripsi?
+Jawaban: Mahasiswa mengajukan topik ke koordinator skripsi -> Penetapan dosen pembimbing -> Penyusunan proposal -> Seminar Proposal -> Penelitian -> Sidang Akhir.
+
+42. Apa saja topik penelitian yang disarankan?
+Jawaban: Topik yang relevan meliputi: Prediksi harga saham/komoditas, Analisis Sentimen media sosial, Deteksi penyakit dari citra medis, Sistem Rekomendasi E-commerce, atau Optimasi logistik.
+
+43. Siapa koordinator program studi saat ini?
+Jawaban: (Data Dinamis) Silakan cek website resmi FTMM Unair atau papan pengumuman prodi untuk nama Kaprodi terbaru.
+
+44. Apa saja profil lulusan Teknologi Sains Data?
+Jawaban: Lulusan dapat berkarir sebagai Data Scientist, Data Analyst, Data Engineer, Machine Learning Engineer, atau AI Specialist.
+
+45. Bagaimana cara mengajukan cuti akademik?
+Jawaban: Pengajuan cuti dilakukan melalui sistem cybercampus (cyber.unair.ac.id) sebelum masa pembayaran UKT semester berjalan berakhir, dengan persetujuan dosen wali dan dekan.
+
+46. Apa saja fasilitas yang tersedia untuk mahasiswa?
+Jawaban: Lab Komputer High Performance Computing (HPC), Co-working space, Perpustakaan, Akses Jurnal Internasional, dan Wi-Fi kampus.
+
+47. Apakah ada program pertukaran pelajar?
+Jawaban: Ya, melalui program IISMA (Indonesian International Student Mobility Awards) atau kerjasama bilateral Unair dengan universitas mitra di luar negeri.
+
+48. Bagaimana sistem penilaian di program studi ini?
+Jawaban: Penilaian terdiri dari UTS, UAS, Tugas/Kuis, dan Partisipasi. Nilai akhir dikonversi menjadi huruf mutu (A, AB, B, BC, C, D, E).
+
+49. Apa saja mata kuliah prasyarat untuk Skripsi?
+Jawaban: Telah lulus Metodologi Penelitian dan Seminar Proposal, serta telah menempuh minimal 120-130 SKS.
+
+50. Bagaimana cara menghubungi dosen wali?
+Jawaban: Anda bisa menghubungi melalui email resmi dosen (biasanya nama@ftmm.unair.ac.id) atau fitur pesan di Cybercampus. Pastikan menggunakan bahasa yang sopan dan formal.
+

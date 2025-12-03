@@ -1,0 +1,101 @@
+question,type,answer
+Apa visi Program Studi Teknologi Sains Data?,single-hop,"unggul dalam penerapan sains data pada bidang kesehatan, sosial, dan komunikasi, industri serta bisnis dan finansial untuk mendukung perkembangan masyarakat ilmiah yang cerdas dan bermoral"
+Sebutkan salah satu misi utama Program Studi Teknologi Sains Data.,single-hop,"menyelenggarakan penelitian dan pengembangan ilmu teknologi sains data yang berstandar nasional dan internasional agar mahasiswa mampu untuk berfikir kritis, berwawasan global, dan mengembangkan keterampilan dalam menjawab tantangan global."
+Apa saja profil lulusan dari Program Studi Teknologi Sains Data?,single-hop,"data scientist, entrepreneur, konsultan analisis data, manajer"
+Apa yang dimaksud dengan CPL aspek Sikap pada Program Studi TSD?,single-hop,Cerminan perilaku dan tata nilai yang harus dimiliki setiap lulusan sebagai warga negara dan profesional
+Apa fokus CPL pada aspek Keterampilan Umum di Program Studi TSD?,single-hop,Fokusnya adalah kemampuan kerja umum yang wajib dimiliki oleh setiap lulusan. Tujuannya adalah untuk menjamin kesetaraan kemampuan lulusan agar sesuai dengan tingkat program dan jenis pendidikan tingginya.
+Apa fokus CPL pada aspek Keterampilan Khusus di Program Studi TSD?,single-hop,"Fokusnya adalah kemampuan kerja khusus yang wajib dimiliki oleh setiap lulusan, yang disesuaikan secara spesifik dengan bidang keilmuan Teknologi Sains Data."
+Apa yang menjadi fokus CPL pada aspek Pengetahuan di Program Studi TSD?,single-hop,"Fokusnya adalah penguasaan konsep, teori, metode, dan/atau falsafah bidang ilmu tertentu secara sistematis."
+Pada semester berapa mata kuliah Pengantar Teknologi Maju diberikan?,single-hop,Semester 2
+Berapa jumlah beban studi (SKS) total pada semester 1?,single-hop,19 sks
+Sebutkan salah satu mata kuliah yang diajarkan pada semester 2.,single-hop,"Logika dan Pemikiran Kristis, Pengantar kolaborasi keilmuan, komunikasi dan pengembangan diri, fisika dasar, matematika, enghantar teknologi maju, metode statistika, algoritma pemograman 1"
+Apa nama mata kuliah dengan kode MAS2106?,single-hop,Probabilitas
+Apa tujuan pembelajaran utama dari mata kuliah Probabilitas?,single-hop,"Memberikan pemahaman mendasar tentang konsep ketidakpastian (uncertainty) dan teori peluang sebagai pondasi utama untuk mempelajari Statistika, Machine Learning, dan Analisis Data."
+Apa prasyarat untuk mengambil mata kuliah Algoritma Pemrograman II?,single-hop,Mengikuti dan lulus pada mata kuliah algoritma pemograman 1
+Pada semester berapa mahasiswa TSD mengambil mata kuliah Skripsi?,single-hop,Semester 8
+Berapa jumlah SKS untuk mata kuliah Skripsi?,single-hop,4 sks
+Sebutkan salah satu referensi wajib pada mata kuliah Pengantar Statistik.,single-hop,"Walpole, R. E., Myers, R. H., Myers, S. L., & Ye, K. (2012). Probability & statistics for engineers & scientists. Boston: Prentice Hall."
+Apa deskripsi singkat dari mata kuliah Kecerdasan Buatan?,single-hop,"mempelajari konsep dasar komunikasi data, meliputi model referensi OSI dan TCP/IP, media transmisi, serta teknik-teknis penting seperti pengkodean data, deteksi kesalahan, dan multiplexing dalam transmisi digital."
+Apa tujuan utama dari mata kuliah Big Data dalam kurikulum TSD?,single-hop,"Mata kuliah ini mempelajari konsep dasar dan cara kerja Big Data, termasuk karakteristik utamanya (Volume, Velocity, Variety). Mahasiswa akan mendalami arsitektur sistem, teknologi penyimpanan (Hadoop HDFS, NoSQL), dan pemrosesan data (MapReduce, Spark), serta memahami tantangan dan penerapannya di berbagai industri"
+Sebutkan salah satu mata kuliah pilihan yang tersedia di Program Studi TSD.,single-hop,"algortma pemograman 2, regresi terapan, teori komunikasi massa, optimasi kombinatorik, analisis data spasial,  "
+Berapa total beban studi (jumlah SKS) yang harus ditempuh mahasiswa TSD hingga lulus?,single-hop,146 sks
+Pada semester berapa mata kuliah Metode Penelitian ditawarkan?,single-hop,semester 6
+Apa peran utama seorang Data Scientist sebagai profil lulusan TSD?,single-hop,"Menggunakan kemampuan multidisiplin (Komputer, Statistik, Matematika) untuk menggali pengetahuan dan wawasan (insight) dari data serta menerapkan teknik analisis lanjut (Machine Learning/AI) untuk memecahkan masalah kompleks."
+Apa peran utama seorang Data Engineer dalam profil lulusan TSD?,single-hop,"Bertanggung jawab atas siklus hidup data, yang meliputi proses teknis seperti pembersihan, penyiapan, dan penyelarasan data (sebelum dianalisis lebih lanjut), serta pengelolaan infrastruktur data."
+Apa peran utama seorang Analis Data Bisnis dalam profil lulusan TSD?,single-hop,"Menggunakan data untuk mendukung pengambilan keputusan strategis dalam sebuah organisasi atau bisnis, serta mengomunikasikan temuan data tersebut (biasanya melalui visualisasi) agar dapat dipahami oleh pemangku kepentingan."
+Sebutkan salah satu bidang penerapan Teknologi Sains Data yang disebutkan dalam silabus.,single-hop,Bisnis
+Jelaskan bagaimana visi Program Studi TSD berkaitan dengan profil lulusan Data Scientist.,multi-hop,"Visi Program Studi TSD menekankan keunggulan di bidang sains data dan teknologi analitik.
+Profil lulusan Data Scientist menuntut kemampuan mengolah, memodelkan, dan menginterpretasi data.
+Kedua informasi ini saling terkait karena visi prodi memberikan arah kemampuan yang harus dimiliki lulusan sehingga profil Data Scientist menjadi perwujudan langsung dari visi tersebut."
+Bagaimana misi Program Studi TSD mendukung CPL pada aspek Sikap?,multi-hop,"Misi Program Studi TSD mencakup pembentukan karakter, etika, dan nilai moral mahasiswa.
+CPL Sikap memastikan mahasiswa memiliki integritas, tanggung jawab sosial, dan etika akademik.
+Keterhubungan keduanya tampak karena CPL Sikap merupakan bentuk terukur dari nilai-nilai yang ditetapkan dalam misi sehingga misi tersebut diwujudkan melalui CPL Sikap."
+Bagaimana hubungan antara CPL Keterampilan Umum dan mata kuliah pemrograman di semester awal?,multi-hop,"CPL Keterampilan Umum menuntut kemampuan menggunakan teknologi dan memecahkan masalah secara sistematis.
+Mata kuliah pemrograman awal memberikan dasar logika komputasional dan problem solving.
+Keduanya berhubungan karena keterampilan umum tidak dapat berkembang tanpa dasar pemrograman sehingga pemrograman menjadi fondasi untuk mencapai CPL tersebut"
+Jelaskan bagaimana CPL Pengetahuan diwujudkan melalui mata kuliah statistik dan matematika.,multi-hop,"CPL Pengetahuan mengharuskan penguasaan teori matematika dan statistika.
+Mata kuliah seperti Kalkulus, Probabilitas, dan Metode Statistika memberikan dasar teoretis tersebut.
+Hubungan ini terbentuk karena pencapaian CPL Pengetahuan hanya dapat terjadi melalui penguatan teori yang diberikan mata kuliah matematika-statistika."
+Bagaimana struktur kurikulum TSD mendukung pencapaian profil lulusan Data Engineer?,multi-hop,"Kurikulum TSD disusun bertahap dari pemrograman dasar ke basis data, jaringan komputer, hingga big data.
+Profil Data Engineer membutuhkan pemahaman pipeline data, infrastruktur, dan pengolahan big data.
+Keduanya saling berkaitan karena struktur kurikulum memberikan alur kompetensi yang sama dengan yang dibutuhkan Data Engineer."
+Mengapa mata kuliah Pengantar Teknologi Informasi penting pada semester 1 untuk mendukung CPL umum?,multi-hop,"Pengantar Teknologi Informasi memberikan pemahaman awal tentang sistem teknologi modern.
+CPL umum menuntut literasi digital dan kemampuan bekerja dalam lingkungan berbasis teknologi.
+Keduanya sesuai karena literasi teknologi yang diajarkan pada mata kuliah tersebut menjadi dasar bagi pencapaian CPL umum"
+Jelaskan kaitan antara mata kuliah Probabilitas dan Big Data dalam membangun kompetensi analitik mahasiswa.,multi-hop,"Probabilitas mengajarkan konsep distribusi dan ketidakpastian dalam data.
+Big Data memerlukan pemahaman statistik untuk menangani data berskala besar.
+Keterkaitannya muncul karena analisis big data tidak dapat dilakukan tanpa fondasi probabilistik sehingga probabilitas menjadi dasar yang melengkapi big data."
+Bagaimana mata kuliah Kecerdasan Buatan dan Pemelajaran Mesin berkontribusi pada profil lulusan Data Scientist?,multi-hop,"Kecerdasan Buatan memberikan dasar konsep sistem cerdas dan logika komputasi.
+Pemelajaran Mesin memperdalam kemampuan membangun model prediktif berbasis data.
+Keduanya saling melengkapi karena machine learning merupakan bagian aplikatif dari AI sehingga penguasaan kedua bidang membangun kompetensi Data Scientist secara utuh."
+Bagaimana peran mata kuliah Metode Penelitian dan Skripsi dalam membentuk kemampuan riset mahasiswa TSD?,multi-hop,"Metode Penelitian mengajarkan penyusunan metodologi dan etika riset.
+Skripsi merupakan penerapan penelitian secara langsung dan terstruktur.
+Hubungan keduanya kuat karena skripsi membutuhkan landasan metodologis dari Metode Penelitian sehingga keduanya membentuk proses riset mahasiswa."
+Jelaskan hubungan antara CPL Keterampilan Khusus dan mata kuliah Big Data.,multi-hop,"CPL Keterampilan Khusus menuntut kemampuan teknis dan penerapan alat analitik.
+Mata kuliah Big Data memberikan pengalaman pengelolaan data besar dan pipeline komputasi.
+Keselarasan ini muncul karena big data menjadi tempat mahasiswa menerapkan keterampilan teknis sehingga mendukung pencapaian CPL tersebut."
+Bagaimana kombinasi mata kuliah matematika dan statistika di beberapa semester mendukung CPL Pengetahuan?,multi-hop,"Mata kuliah matematika dan statistika tersebar di banyak semester sebagai dasar teori.
+CPL Pengetahuan menuntut penguasaan teori analitik dan konsep matematis.
+Keterhubungan keduanya terlihat karena CPL tersebut hanya dapat dicapai melalui penguatan pemahaman teori yang dibangun secara bertahap lewat mata kuliah tersebut."
+Mengapa mata kuliah umum seperti Agama dan Pancasila tetap dimasukkan dalam kurikulum TSD?,multi-hop,"Mata kuliah umum seperti Agama dan Pancasila menanamkan nilai moral dan etika.
+Penggunaan teknologi data dalam TSD membutuhkan tanggung jawab dan integritas.
+Hubungannya adalah bahwa nilai moral dari mata kuliah umum menjadi landasan etis bagi mahasiswa dalam memanfaatkan teknologi data."
+Jelaskan bagaimana mata kuliah pemrograman mendukung profil lulusan sebagai Data Engineer.,multi-hop,"Pemrograman membentuk logika komputasi dan kemampuan menyusun sistem.
+Data Engineer membutuhkan keterampilan teknis dalam pengembangan pipeline data.
+Hubungannya jelas karena pemrograman adalah dasar utama yang diperlukan untuk membangun sistem data sehingga mendukung profil Data Engineer."
+Bagaimana susunan mata kuliah dari semester awal hingga akhir mencerminkan visi Program Studi TSD?,multi-hop,"Semester awal kurikulum fokus pada dasar matematika dan pemrograman.
+Semester akhir memuat aplikasi lanjut seperti big data dan skripsi.
+Alur ini menunjukkan keterkaitan dengan visi prodi karena struktur bertahap mempersiapkan mahasiswa menjadi ahli sains data sesuai arah visi tersebut."
+Bagaimana mata kuliah visualisasi data dan eksplorasi data membantu mahasiswa mencapai CPL Keterampilan Umum?,multi-hop,"Visualisasi data mengajarkan mahasiswa menyampaikan informasi analitis secara jelas.
+CPL Keterampilan Umum menuntut kemampuan komunikasi ilmiah.
+Hubungannya terletak pada fungsi visualisasi sebagai komunikasi ilmiah berbasis grafis sehingga mendukung CPL tersebut."
+Jelaskan bagaimana mata kuliah jaringan komputer dan manajemen basis data berkontribusi pada profil Data Engineer.,multi-hop,"Jaringan komputer mengajarkan infrastruktur transfer data.
+Basis data mengajarkan penyimpanan dan manajemen data terstruktur.
+Keterkaitan keduanya mendukung peran Data Engineer karena pipeline data membutuhkan pemahaman kedua aspek tersebut secara bersamaan."
+Bagaimana hubungan antara CPL Sikap dan pelaksanaan tugas akhir/Skripsi?,multi-hop,"CPL Sikap menekankan etika, kedisiplinan, dan tanggung jawab akademik.
+Skripsi menuntut kejujuran ilmiah, ketelitian, dan komitmen dalam penyelesaian penelitian.
+Kedua bagian ini berhubungan karena proses skripsi merupakan momen pengujian sikap profesional yang menjadi target CPL tersebut."
+Jelaskan bagaimana kegiatan praktikum dalam beberapa mata kuliah mendukung pencapaian CPL Keterampilan Khusus.,multi-hop,"Praktikum memberi pengalaman langsung menggunakan alat dan metode analitik.
+CPL Keterampilan Khusus menuntut kemampuan teknis yang dapat diterapkan.
+Keduanya selaras karena praktikum menjadi media penerapan keterampilan yang ditargetkan dalam CPL tersebut."
+"Bagaimana profil lulusan Business/Data Analyst tercermin dari kombinasi mata kuliah statistik, bisnis, dan visualisasi data?",multi-hop,"Statistika memberikan kemampuan analisis kuantitatif.
+Visualisasi dan konteks bisnis mengarahkan interpretasi data untuk pengambilan keputusan.
+Hubungannya kuat karena Business/Data Analyst membutuhkan kombinasi analisis numerik dan interpretasi bisnis sehingga ketiga elemen tersebut saling mendukung."
+Mengapa penguasaan metode statistik sangat ditekankan dalam CPL Pengetahuan dan bagaimana hal itu tercermin pada daftar mata kuliah?,multi-hop,"Kurikulum TSD memuat banyak mata kuliah statistika dari dasar hingga lanjutan.
+CPL Pengetahuan menuntut penguasaan menyeluruh atas konsep analitik.
+Hubungannya tampak karena keberulangan mata kuliah statistika memperkuat pencapaian CPL tersebut melalui pemahaman teori yang konsisten."
+Jelaskan keterkaitan antara visi Program Studi TSD dengan peluang karier lulusan yang disebutkan.,multi-hop,"Visi prodi berfokus pada penguasaan sains data dan teknologi analitik.
+Peluang karier lulusan meliputi Data Scientist, Data Engineer, dan analis data.
+Keduanya berhubungan karena visi tersebut mempersiapkan kemampuan yang dibutuhkan untuk karier-karier tersebut sehingga peluang kerja selaras dengan tujuan program studi."
+Bagaimana sebaran SKS per semester mendukung beban belajar yang seimbang bagi mahasiswa TSD?,multi-hop,"SKS dasar seperti matematika dan pemrograman ditempatkan di semester awal.
+Mata kuliah lanjutan dan skripsi ada di semester akhir.
+Struktur ini menciptakan beban belajar seimbang karena penguasaan dasar dilakukan sebelum memasuki materi kompleks sehingga perkembangan mahasiswa lebih terarah."
+Bagaimana mata kuliah terkait etika dan regulasi teknologi mendukung sikap profesional lulusan TSD?,multi-hop,"Mata kuliah etika dan kewarganegaraan menanamkan nilai tanggung jawab dan pemahaman regulasi.
+Profesi data membutuhkan kepatuhan pada aturan dan etika penggunaan data.
+Hubungan tersebut terlihat karena nilai regulasi dan etika dari mata kuliah umum menjadi fondasi untuk bekerja secara profesional di bidang data."
+Jelaskan keterkaitan antara CPL umum dan mata kuliah komunikasi atau penulisan ilmiah dalam kurikulum TSD.,multi-hop,"CPL umum menuntut kemampuan komunikasi ilmiah dan pelaporan riset.
+Mata kuliah penelitian dan skripsi melatih mahasiswa menyusun laporan ilmiah secara formal.
+Keterkaitannya terletak pada bahwa penulisan ilmiah merupakan bentuk nyata kemampuan komunikasi ilmiah sehingga mata kuliah ini mendukung CPL tersebut."
+"Bagaimana keseluruhan kurikulum TSD mempersiapkan lulusan untuk berkontribusi di bidang kesehatan, sosial, dan ekonomi berbasis data?",multi-hop,"Kurikulum TSD mencakup mata kuliah penerapan seperti Data Medis, Big Data, dan Analisis Spasial.
+Bidang kesehatan, sosial, dan ekonomi sangat membutuhkan analisis data untuk pengambilan keputusan.
+Keduanya selaras karena kurikulum tersebut mempersiapkan mahasiswa untuk menerapkan analitik data secara langsung dalam berbagai sektor masyarakat."
