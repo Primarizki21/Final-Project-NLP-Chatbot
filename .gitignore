@@ -1,0 +1,8 @@
+.env
+*.ipynb
+*.html
+*.md
+*.pdf
+generate_flowchart_image.py
+generate_simple_flowchart_image.py
+INSTALL_QUICK.txt
