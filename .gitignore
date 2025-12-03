@@ -5,4 +5,6 @@
 *.pdf
 generate_flowchart_image.py
 generate_simple_flowchart_image.py
+config.py
 INSTALL_QUICK.txt
+__pycache__/
