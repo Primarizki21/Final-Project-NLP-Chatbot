@@ -1,10 +1,17 @@
+# File Biasa
 .env
 *.ipynb
 *.html
 *.md
 *.pdf
+*.csv
+*.xlsx
+
+# Nama File
 generate_flowchart_image.py
 generate_simple_flowchart_image.py
 config.py
 INSTALL_QUICK.txt
+
+# Folder
 __pycache__/
