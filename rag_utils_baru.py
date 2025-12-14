@@ -15,41 +15,67 @@ _cross_encoder: CrossEncoder | None = None
 _doc_embeddings = None
 _bm25_model: BM25Okapi | None = None
 
-def load_documents() -> List[str]:
+def load_documents(exclude_ground_truth: bool = False) -> List[str]:
     docs: List[str] = []
-    xlsx_path = "data_baru.xlsx"
-    if os.path.exists(xlsx_path):
-        try:
-            all_sheets = pd.read_excel(xlsx_path, sheet_name=None)
-            for sheet_name, df in all_sheets.items():
-                if df is None or df.empty: continue
-                for _, row in df.iterrows():
-                    cells = [str(v).strip() for v in row.values if not pd.isna(v) and str(v).strip()]
-                    if not cells: continue
-                    doc_text = f"[{sheet_name}] " + " | ".join(cells)
-                    if len(doc_text) >= 20: docs.append(doc_text)
-        except Exception as e: print(f"Error reading excel: {e}")
-
-    if docs: return docs
+    
+    xlsx_paths = ["data.xlsx"]
+    for xlsx_path in xlsx_paths:
+        if os.path.exists(xlsx_path):
+            try:
+                print(f"[LOAD] Membaca dokumen dari: {xlsx_path}")
+                all_sheets = pd.read_excel(xlsx_path, sheet_name=None)
+                for sheet_name, df in all_sheets.items():
+                    if df is None or df.empty: continue
+                    for _, row in df.iterrows():
+                        cells = [str(v).strip() for v in row.values if not pd.isna(v) and str(v).strip()]
+                        if not cells: continue
+                        doc_text = f"[{sheet_name}] " + " | ".join(cells)
+                        if len(doc_text) >= 20: docs.append(doc_text)
+                if docs:
+                    print(f"[LOAD] Berhasil memuat {len(docs)} dokumen dari {xlsx_path}")
+                    return docs
+            except Exception as e:
+                print(f"[WARNING] Error reading {xlsx_path}: {e}")
+                continue
 
     # 2. Kedua: pdf_content.txt
     pdf_path = "pdf_content.txt"
     if os.path.exists(pdf_path):
-        with open(pdf_path, "r", encoding="utf-8") as f:
-            raw_chunks = f.read().split("\n\n")
-            for chunk in raw_chunks:
-                if len(chunk.strip()) >= 50: docs.append(chunk.strip())
+        try:
+            print(f"[LOAD] Membaca dokumen dari: {pdf_path}")
+            with open(pdf_path, "r", encoding="utf-8") as f:
+                raw_chunks = f.read().split("\n\n")
+                for chunk in raw_chunks:
+                    if len(chunk.strip()) >= 50: docs.append(chunk.strip())
+            if docs:
+                print(f"[LOAD] Berhasil memuat {len(docs)} dokumen dari {pdf_path}")
+                return docs
+        except Exception as e:
+            print(f"[WARNING] Error reading {pdf_path}: {e}")
 
-    if docs: return docs
-
-    # 3. Fallback: ground.csv
-    kb_path = "ground.csv"
-    if os.path.exists(kb_path):
-        with open(kb_path, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                qa = f"Pertanyaan: {row.get('question','')}\nJawaban: {row.get('answer','')}"
-                if len(qa) > 10: docs.append(qa)
+    # 3. Fallback: ground.csv (HANYA jika exclude_ground_truth=False)
+    # Untuk evaluasi, kita TIDAK ingin memuat ground.csv karena akan menyebabkan data leakage
+    if not exclude_ground_truth:
+        kb_path = "ground.csv"
+        if os.path.exists(kb_path):
+            try:
+                print(f"[LOAD] Membaca dokumen dari: {kb_path} (fallback)")
+                with open(kb_path, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        qa = f"Pertanyaan: {row.get('question','')}\nJawaban: {row.get('answer','')}"
+                        if len(qa) > 10: docs.append(qa)
+                if docs:
+                    print(f"[LOAD] Berhasil memuat {len(docs)} dokumen dari {kb_path}")
+                    return docs
+            except Exception as e:
+                print(f"[WARNING] Error reading {kb_path}: {e}")
+    
+    # Jika semua gagal
+    print(f"[ERROR] Tidak ada dokumen yang berhasil dimuat!")
+    print(f"[ERROR] File yang dicari: data_baru.xlsx, data.xlsx, pdf_content.txt")
+    if not exclude_ground_truth:
+        print(f"[ERROR] Fallback: ground.csv")
     return docs
 
 def get_embedder() -> SentenceTransformer:
@@ -67,11 +93,11 @@ def get_cross_encoder() -> CrossEncoder:
         _cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
     return _cross_encoder
 
-def get_documents_and_embeddings():
+def get_documents_and_embeddings(exclude_ground_truth: bool = False):
     global _documents, _doc_embeddings, _bm25_model
 
     if not _documents:
-        _documents = load_documents()
+        _documents = load_documents(exclude_ground_truth=exclude_ground_truth)
 
     # Init Dense Embeddings
     if _doc_embeddings is None:
@@ -80,9 +106,21 @@ def get_documents_and_embeddings():
     
     # Init BM25 Index (New)
     if _bm25_model is None:
-        print("Building BM25 Index...")
+        if not _documents:
+            print("[ERROR] Tidak ada dokumen untuk membuat BM25 index!")
+            raise ValueError("Documents list is empty. Cannot create BM25 model.")
+        
+        print(f"[INIT] Building BM25 Index dari {len(_documents)} dokumen...")
         tokenized_corpus = [doc.lower().split() for doc in _documents]
+        
+        # Validasi: pastikan ada dokumen yang tidak kosong setelah tokenisasi
+        tokenized_corpus = [tokens for tokens in tokenized_corpus if tokens]  # Hapus dokumen kosong
+        if not tokenized_corpus:
+            print("[ERROR] Semua dokumen kosong setelah tokenisasi!")
+            raise ValueError("All documents are empty after tokenization. Cannot create BM25 model.")
+        
         _bm25_model = BM25Okapi(tokenized_corpus)
+        print(f"[INIT] BM25 Index berhasil dibuat dari {len(tokenized_corpus)} dokumen")
 
     return _documents, _doc_embeddings
 
@@ -173,6 +211,35 @@ def retrieve_with_rerank(query: str, k: int = 5, fetch_k: int = 20) -> List[Tupl
     # Return top k format: (doc_text, new_score)
     final_results = [(item[0][0], float(item[1])) for item in reranked[:k]]
     return final_results
+
+def retrieve_with_hyde(query: str, k: int = 5, model_gen=None) -> List[Tuple[str, float]]:
+    """
+    Method 7: HyDE (Hypothetical Document Embeddings)
+    Generate hypothetical answer menggunakan LLM, lalu gunakan untuk retrieval.
+    
+    Args:
+        query: Query asli dari user
+        k: Jumlah dokumen yang di-retrieve
+        model_gen: Gemini model untuk generate hypothetical answer (optional)
+    
+    Returns:
+        List dokumen yang di-retrieve menggunakan hypothetical answer
+    """
+    # Jika tidak ada model_gen, return empty list (akan di-handle di app.py dengan fallback)
+    if not model_gen:
+        return []
+    
+    try:
+        # Generate hypothetical answer
+        prompt = f"Tuliskan jawaban singkat hipotetis untuk pertanyaan berikut: {query}"
+        response = model_gen.generate_content(prompt)
+        hypothetical_answer = response.text.strip()
+        
+        # Gunakan hypothetical answer untuk retrieval (dense, tanpa lexical boost)
+        return retrieve_documents(hypothetical_answer, k=k, lexical_boost=False)
+    except Exception as e:
+        print(f"[WARNING] HyDE error: {e}")
+        return []
 
 def build_context_from_results(results: List[Tuple[str, float]], min_score: float = 0.4) -> str:
     context_parts = []
