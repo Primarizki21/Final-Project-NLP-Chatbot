@@ -4,8 +4,6 @@
 *.html
 *.md
 *.pdf
-*.csv
-*.xlsx
 
 # Nama File
 generate_flowchart_image.py
