@@ -15,7 +15,7 @@ from rag_utils_baru import (
 )
 
 # --- CONFIGURATION ---
-DATASET_PATH = "new_ground_truth.xlsx"
+DATASET_PATH = "new_ground_truth_baru.xlsx"
 SAMPLE_SIZE = 100 
 K_RETRIEVAL = 3
 CONTEXT_MIN_SCORE = 0.0

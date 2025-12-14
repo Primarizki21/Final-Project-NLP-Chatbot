@@ -4,6 +4,16 @@
 *.html
 *.md
 *.pdf
+*.xlsx
+*.csv
+
+# File Ground Tru
+!new_ground_truth_baru.xlsx
+!new_ground_truth.xlsx
+!data.xlsx
+!data_baru.xlsx
+!ground.csv
+!pdf_content.txt
 
 # Nama File
 generate_flowchart_image.py
