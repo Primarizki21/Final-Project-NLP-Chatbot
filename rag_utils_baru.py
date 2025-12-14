@@ -8,7 +8,6 @@ from sentence_transformers import SentenceTransformer, CrossEncoder, util
 import pandas as pd
 from rank_bm25 import BM25Okapi
 
-# Global objects
 _documents: List[str] = []
 _embedder: SentenceTransformer | None = None
 _cross_encoder: CrossEncoder | None = None
@@ -38,7 +37,6 @@ def load_documents(exclude_ground_truth: bool = False) -> List[str]:
                 print(f"[WARNING] Error reading {xlsx_path}: {e}")
                 continue
 
-    # 2. Kedua: pdf_content.txt
     pdf_path = "pdf_content.txt"
     if os.path.exists(pdf_path):
         try:
@@ -53,8 +51,6 @@ def load_documents(exclude_ground_truth: bool = False) -> List[str]:
         except Exception as e:
             print(f"[WARNING] Error reading {pdf_path}: {e}")
 
-    # 3. Fallback: ground.csv (HANYA jika exclude_ground_truth=False)
-    # Untuk evaluasi, kita TIDAK ingin memuat ground.csv karena akan menyebabkan data leakage
     if not exclude_ground_truth:
         kb_path = "ground.csv"
         if os.path.exists(kb_path):
@@ -99,12 +95,10 @@ def get_documents_and_embeddings(exclude_ground_truth: bool = False):
     if not _documents:
         _documents = load_documents(exclude_ground_truth=exclude_ground_truth)
 
-    # Init Dense Embeddings
     if _doc_embeddings is None:
         embedder = get_embedder()
         _doc_embeddings = embedder.encode(_documents, convert_to_tensor=True)
     
-    # Init BM25 Index (New)
     if _bm25_model is None:
         if not _documents:
             print("[ERROR] Tidak ada dokumen untuk membuat BM25 index!")
@@ -149,16 +143,13 @@ def retrieve_documents(query: str, k: int = 5, lexical_boost: bool = True) -> Li
 
 def retrieve_bm25(query: str, k: int = 5) -> List[Tuple[str, float]]:
     """Method 4: Pure BM25"""
-    documents, _ = get_documents_and_embeddings() # Ensure loaded
+    documents, _ = get_documents_and_embeddings()
     global _bm25_model
     
     tokenized_query = query.lower().split()
-    # Get top-k documents
     top_docs = _bm25_model.get_top_n(tokenized_query, documents, n=k)
-    # BM25 library doesn't return scores easily in top_n, so we recalculate for those
     results = []
     doc_scores = _bm25_model.get_scores(tokenized_query)
-    # Map back to get scores
     top_indices = np.argsort(doc_scores)[::-1][:k]
     for idx in top_indices:
         results.append((documents[idx], float(doc_scores[idx])))
@@ -170,72 +161,53 @@ def retrieve_hybrid_rrf(query: str, k: int = 5, k_rrf: int = 60) -> List[Tuple[s
     embedder = get_embedder()
     global _bm25_model
 
-    # 1. Get Dense Results (Indices)
     query_embedding = embedder.encode(query, convert_to_tensor=True)
     dense_scores = util.cos_sim(query_embedding, doc_embeddings)[0]
     dense_top_k = torch.topk(dense_scores, k=min(len(documents), k * 2)).indices.tolist()
 
-    # 2. Get BM25 Results (Indices)
     tokenized_query = query.lower().split()
     bm25_scores = _bm25_model.get_scores(tokenized_query)
     bm25_top_k = np.argsort(bm25_scores)[::-1][:min(len(documents), k * 2)]
 
-    # 3. Fuse Ranks (RRF Algorithm)
     rrf_score = {}
     for rank, idx in enumerate(dense_top_k):
         rrf_score[idx] = rrf_score.get(idx, 0) + (1 / (k_rrf + rank + 1))
     for rank, idx in enumerate(bm25_top_k):
         rrf_score[idx] = rrf_score.get(idx, 0) + (1 / (k_rrf + rank + 1))
 
-    # Sort by RRF score
     sorted_rrf = sorted(rrf_score.items(), key=lambda x: x[1], reverse=True)[:k]
     
     return [(documents[idx], score) for idx, score in sorted_rrf]
 
 def retrieve_with_rerank(query: str, k: int = 5, fetch_k: int = 20) -> List[Tuple[str, float]]:
     documents, _ = get_documents_and_embeddings()
-    # 1. First Stage: Retrieve more candidates (fetch_k) using fast Dense
-    candidates = retrieve_documents(query, k=fetch_k, lexical_boost=False) # Get simple dense results
+    candidates = retrieve_documents(query, k=fetch_k, lexical_boost=False)
     
     if not candidates: return []
 
-    # 2. Second Stage: Re-Rank with Cross-Encoder
     ce = get_cross_encoder()
     ce_inputs = [[query, doc_text] for doc_text, _ in candidates]
     ce_scores = ce.predict(ce_inputs)
 
-    # Combine and Sort
     reranked = list(zip(candidates, ce_scores))
     reranked.sort(key=lambda x: x[1], reverse=True)
 
-    # Return top k format: (doc_text, new_score)
     final_results = [(item[0][0], float(item[1])) for item in reranked[:k]]
     return final_results
 
 def retrieve_with_hyde(query: str, k: int = 5, model_gen=None) -> List[Tuple[str, float]]:
     """
     Method 7: HyDE (Hypothetical Document Embeddings)
-    Generate hypothetical answer menggunakan LLM, lalu gunakan untuk retrieval.
-    
-    Args:
-        query: Query asli dari user
-        k: Jumlah dokumen yang di-retrieve
-        model_gen: Gemini model untuk generate hypothetical answer (optional)
-    
-    Returns:
-        List dokumen yang di-retrieve menggunakan hypothetical answer
     """
-    # Jika tidak ada model_gen, return empty list (akan di-handle di app.py dengan fallback)
+
     if not model_gen:
         return []
     
     try:
-        # Generate hypothetical answer
         prompt = f"Tuliskan jawaban singkat hipotetis untuk pertanyaan berikut: {query}"
         response = model_gen.generate_content(prompt)
         hypothetical_answer = response.text.strip()
         
-        # Gunakan hypothetical answer untuk retrieval (dense, tanpa lexical boost)
         return retrieve_documents(hypothetical_answer, k=k, lexical_boost=False)
     except Exception as e:
         print(f"[WARNING] HyDE error: {e}")
@@ -244,8 +216,6 @@ def retrieve_with_hyde(query: str, k: int = 5, model_gen=None) -> List[Tuple[str
 def build_context_from_results(results: List[Tuple[str, float]], min_score: float = 0.4) -> str:
     context_parts = []
     for doc, score in results:
-        # Untuk BM25/RRF skornya bisa bervariasi, jadi min_score mungkin perlu diabaikan atau disesuaikan
-        # Kita set constraint sederhana agar tidak menyaring terlalu agresif
         if score > -999: 
             context_parts.append(f"- {doc}")
     return "\n".join(context_parts)

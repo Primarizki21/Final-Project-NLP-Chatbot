@@ -6,26 +6,22 @@ import google.generativeai as genai
 from sentence_transformers import util
 from config import GEMINI_API_KEY
 from rank_bm25 import BM25Okapi
-# --- IMPORT DARI RAG_UTILS_BARU (Gunakan file Anda yang sudah ada) ---
 import rag_utils_baru as rag
 from rag_utils_baru import (
-    retrieve_documents,      # Untuk Dense & Hybrid Custom
-    retrieve_bm25,           # Untuk BM25
-    retrieve_hybrid_rrf,     # Untuk Hybrid RRF
-    retrieve_with_rerank,    # Untuk Re-ranking
+    retrieve_documents,
+    retrieve_bm25,
+    retrieve_hybrid_rrf,
+    retrieve_with_rerank,
     get_embedder,
-    get_documents_and_embeddings # Fungsi inisialisasi dari rag_utils
+    get_documents_and_embeddings
 )
 
-# [REVISI] Menggunakan file XLSX, bukan CSV
 GT_PATH = "new_ground_truth_baru.xlsx" 
 OUTPUT_FILE = "hasil_evaluasi_retrieval_detail.xlsx"
 
-# Settings
 K_VALUES = [1, 3, 5, 10, 20]
 RELEVANCE_THRESHOLD = 0.6 
 
-# Setup Gemini (Optional - Hanya untuk metode HyDE & MultiQuery)
 model_gen = None
 if GEMINI_API_KEY and GEMINI_API_KEY != "MASUKKAN_API_KEY_ANDA":
     try:
@@ -35,7 +31,6 @@ if GEMINI_API_KEY and GEMINI_API_KEY != "MASUKKAN_API_KEY_ANDA":
     except Exception as e:
         print(f"[WARNING] Gagal load Gemini model: {e}")
 
-# --- METRIC FUNCTIONS ---
 def calculate_metrics(retrieved_docs, ground_truth_answer, embedder):
     """Cek relevansi menggunakan semantic similarity."""
     if not retrieved_docs or not ground_truth_answer:
@@ -60,8 +55,6 @@ def calculate_metrics(retrieved_docs, ground_truth_answer, embedder):
     recall_hit = 1 if is_hit else 0
     return precision, recall_hit
 
-
-# --- GENERATIVE HELPERS ---
 def generate_hyde(query):
     if not model_gen: return query
     try:
@@ -77,30 +70,23 @@ def generate_multiquery(query):
         return lines[:3]
     except: return [query]
 
-# --- MAIN LOOP ---
 def main():
     print("\n=== EVALUASI RETRIEVAL: 8 METODE ===")
     
-    # 0. RESET GLOBAL STATE untuk memastikan tidak ada leakage dari run sebelumnya
     rag._documents = []
     rag._doc_embeddings = None
     rag._bm25_model = None
     
-    # 1. LOAD SOAL EVALUASI (GROUND TRUTH)
-    # Ground truth berisi pertanyaan dan jawaban yang merujuk ke dokumen di data_baru.xlsx
-    # Kolom source (source_id, source_title, source_section, source_type) merujuk ke data_baru.xlsx
     try:
         print(f"[INIT] Membaca Ground Truth dari: {GT_PATH}...")
         df_gt = pd.read_excel(GT_PATH)
         
         print(f"[DEBUG] Kolom yang ditemukan: {list(df_gt.columns)}")
         
-        # Deteksi kolom secara dinamis (case insensitive)
         cols = {c.lower(): c for c in df_gt.columns}
         q_col = cols.get('question') or cols.get('pertanyaan') or cols.get('query')
         a_col = cols.get('answer') or cols.get('jawaban') or cols.get('response')
         
-        # Cek apakah ada kolom source untuk mapping ke data_baru.xlsx
         source_id_col = cols.get('source_id')
         source_title_col = cols.get('source_title')
         source_section_col = cols.get('source_section')
@@ -119,12 +105,10 @@ def main():
         questions = df_gt[q_col].dropna().tolist()
         answers = df_gt[a_col].dropna().tolist()
         
-        # Jika ada kolom source, kita bisa gunakan untuk validasi (opsional)
         if source_id_col:
             source_ids = df_gt[source_id_col].dropna().tolist()
             print(f"[INFO] Ground truth memiliki {len([s for s in source_ids if pd.notna(s)])} referensi source_id")
         
-        # Limit sampel biar cepat (hapus baris ini jika ingin full)
         LIMIT = 100
         questions = questions[:LIMIT]
         answers = answers[:LIMIT]
@@ -136,15 +120,10 @@ def main():
         import traceback
         traceback.print_exc()
         return
-    
-    # 2. SETUP KNOWLEDGE BASE
-    # TIDAK exclude ground truth karena tujuan evaluasi IR adalah melihat apakah retrieval
-    # berhasil menemukan dokumen yang relevan. Ground truth answer mungkin lebih ringkas,
-    # sementara dokumen di KB lebih lengkap. Yang penting adalah evaluasi melihat relevansi.
+
     print("[INIT] Loading Knowledge Base dari data_baru.xlsx...")
     embedder = get_embedder()
     
-    # Load knowledge base (TIDAK exclude ground truth)
     get_documents_and_embeddings(exclude_ground_truth=False)
     
     if not rag._documents:
@@ -162,12 +141,11 @@ def main():
     print(f"[EVAL] Total kombinasi: {len(questions)} x 8 x {len(K_VALUES)} = {len(questions) * 8 * len(K_VALUES)}\n")
     
     for i, (q, gt) in enumerate(zip(questions, answers)):
-        q = str(q)  # Pastikan string
+        q = str(q)
         gt = str(gt)
         
         print(f"\n[{i+1}/{len(questions)}] Question: {q[:60]}...")
         
-        # Helper function untuk menyimpan hasil evaluasi
         def save_result(method_name, k_value, retrieved_data, precision, recall_hit):
             """Simpan hasil evaluasi untuk satu metode dan satu nilai k"""
             top_doc = retrieved_data[0][0] if retrieved_data else "NO RESULT"
@@ -184,8 +162,6 @@ def main():
                 "Recall (Hit)": recall_hit
             })
 
-        # --- METODE 1: Naive Lexical (Manual) ---
-        # Pre-compute scores untuk semua dokumen (hanya sekali per pertanyaan)
         kb_docs = rag._documents 
         q_set = set(q.lower().split())
         lex_scores = []
@@ -195,45 +171,37 @@ def main():
             lex_scores.append((d, sc))
         lex_scores_sorted = sorted(lex_scores, key=lambda x:x[1], reverse=True)
         
-        # Evaluasi untuk setiap nilai k
         for k in K_VALUES:
             retrieved = lex_scores_sorted[:k]
             prec, hit = calculate_metrics(retrieved, gt, embedder)
             save_result("1. Naive Lexical", k, retrieved, prec, hit)
 
-        # --- METODE 2: Dense (SBERT) ---
         for k in K_VALUES:
             retrieved = retrieve_documents(q, k=k, lexical_boost=False)
             prec, hit = calculate_metrics(retrieved, gt, embedder)
             save_result("2. Dense", k, retrieved, prec, hit)
 
-        # --- METODE 3: Hybrid Custom ---
         for k in K_VALUES:
             retrieved = retrieve_documents(q, k=k, lexical_boost=True)
             prec, hit = calculate_metrics(retrieved, gt, embedder)
             save_result("3. Hybrid Custom", k, retrieved, prec, hit)
 
-        # --- METODE 4: BM25 ---
         for k in K_VALUES:
             retrieved = retrieve_bm25(q, k=k)
             prec, hit = calculate_metrics(retrieved, gt, embedder)
             save_result("4. BM25", k, retrieved, prec, hit)
 
-        # --- METODE 5: Hybrid RRF ---
         for k in K_VALUES:
             retrieved = retrieve_hybrid_rrf(q, k=k)
             prec, hit = calculate_metrics(retrieved, gt, embedder)
             save_result("5. Hybrid RRF", k, retrieved, prec, hit)
 
-        # --- METODE 6: Re-Ranking ---
         for k in K_VALUES:
-            # fetch_k harus >= k, kita set 2x k untuk memastikan cukup kandidat
             fetch_k = max(k * 2, 20)
             retrieved = retrieve_with_rerank(q, k=k, fetch_k=fetch_k)
             prec, hit = calculate_metrics(retrieved, gt, embedder)
             save_result("6. Re-Ranking", k, retrieved, prec, hit)
 
-        # --- METODE 7: HyDE (Perlu API Key) ---
         if model_gen:
             hyde_q = generate_hyde(q)
             for k in K_VALUES:
@@ -253,14 +221,11 @@ def main():
                     "Recall (Hit)": 0
                 })
 
-        # --- METODE 8: Multi-Query (Perlu API Key) ---
         if model_gen:
             qs = generate_multiquery(q)
-            # Pre-compute untuk semua sub-queries
             combined = []
             for sub_q in qs:
                 combined.extend(retrieve_documents(sub_q, k=max(K_VALUES), lexical_boost=False))
-            # Deduplikasi
             seen, unique = set(), []
             for d, s in combined:
                 if d not in seen:
@@ -268,7 +233,6 @@ def main():
                     seen.add(d)
             unique.sort(key=lambda x:x[1], reverse=True)
             
-            # Evaluasi untuk setiap nilai k
             for k in K_VALUES:
                 retrieved = unique[:k]
                 prec, hit = calculate_metrics(retrieved, gt, embedder)
@@ -286,39 +250,32 @@ def main():
                     "Recall (Hit)": 0
                 })
         
-        # Progress indicator
         if (i + 1) % 10 == 0:
             print(f"[PROGRESS] Selesai {i+1}/{len(questions)} pertanyaan...")
 
-    # 5. ANALISIS HASIL DAN SAVE
     print("\n" + "="*80)
     print("ANALISIS HASIL EVALUASI")
     print("="*80)
     
     df_res = pd.DataFrame(all_results)
     
-    # Summary per metode dan per k
     print("\n--- AVERAGE PRECISION PER METODE DAN PER K ---")
     summary_k = df_res.groupby(["Method", "K"])[["Precision", "Recall (Hit)"]].mean().reset_index()
     summary_k = summary_k.pivot(index="Method", columns="K", values="Precision")
     print(summary_k.round(4))
     
-    # Average Precision per metode (rata-rata semua k)
     print("\n--- AVERAGE PRECISION PER METODE (Rata-rata semua K) ---")
     summary_method = df_res.groupby("Method")[["Precision", "Recall (Hit)"]].mean().reset_index()
     summary_method = summary_method.sort_values("Precision", ascending=False)
     print(summary_method.round(4))
     
-    # Average Precision per k (rata-rata semua metode)
     print("\n--- AVERAGE PRECISION PER K (Rata-rata semua Metode) ---")
     summary_k_avg = df_res.groupby("K")[["Precision", "Recall (Hit)"]].mean().reset_index()
     print(summary_k_avg.round(4))
     
-    # Save detailed results
     print(f"\n[SAVE] Menyimpan hasil detail ke: {OUTPUT_FILE}")
     df_res.to_excel(OUTPUT_FILE, index=False)
     
-    # Save summary
     summary_file = OUTPUT_FILE.replace(".xlsx", "_summary.xlsx")
     with pd.ExcelWriter(summary_file, engine='openpyxl') as writer:
         summary_method.to_excel(writer, sheet_name="Avg Per Method", index=False)

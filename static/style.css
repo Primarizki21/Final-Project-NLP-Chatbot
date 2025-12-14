@@ -296,6 +296,22 @@ body {
     line-height: 1.5;
 }
 
+/* Markdown formatting styles */
+.message .content strong {
+    font-weight: 700;
+    font-weight: bold;
+}
+
+.message .content em {
+    font-style: italic;
+}
+
+.message .content strong em,
+.message .content em strong {
+    font-weight: 700;
+    font-style: italic;
+}
+
 .message.system-message .content {
     background: var(--chat-bubble-bot);
     border: 1px solid #e5e7eb;
@@ -461,3 +477,19 @@ button {
     }
 }
 
+.message .content ul {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding-left: 24px;
+    list-style-type: disc;
+}
+
+.message .content li {
+    margin-bottom: 4px;
+    line-height: 1.5;
+}
+
+.message.user-message .content ul,
+.message.user-message .content li {
+    color: inherit;
+}

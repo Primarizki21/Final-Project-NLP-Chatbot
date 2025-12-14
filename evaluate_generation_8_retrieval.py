@@ -5,7 +5,6 @@ import google.generativeai as genai
 from rouge_score import rouge_scorer
 from config import GEMINI_API_KEY
 
-# Import fungsi retrieval baru dari rag_utils_baru
 from rag_utils_baru import (
     retrieve_documents, 
     retrieve_bm25, 
@@ -14,14 +13,12 @@ from rag_utils_baru import (
     get_documents_and_embeddings
 )
 
-# --- CONFIGURATION ---
 DATASET_PATH = "new_ground_truth_baru.xlsx"
 SAMPLE_SIZE = 100 
 K_RETRIEVAL = 3
 CONTEXT_MIN_SCORE = 0.0
 OUTPUT_FILE = "evaluation_8_methods_ir.xlsx"
 
-# Configure Gemini
 print(GEMINI_API_KEY)
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
@@ -53,7 +50,7 @@ def load_dataset(path: str, limit: int):
         return [], []
 
 def retrieve_lexical_only(query: str, documents: list, k: int = 5):
-    """Metode 1: Naive Token Overlap (Lama)"""
+    """Metode 1: Naive Token Overlap"""
     query_tokens = set(query.lower().split())
     scores = []
     for doc in documents:
@@ -96,11 +93,9 @@ def main():
     global model
     print("=== EVALUASI 8 METODE RETRIEVAL ===\n")
 
-    # Load Data
     questions, answers = load_dataset(DATASET_PATH, limit=SAMPLE_SIZE)
     if not questions: return
 
-    # Init Knowledge Base
     documents, _ = get_documents_and_embeddings()
     print(f"Knowledge Base ready. Docs: {len(documents)}")
 
@@ -110,7 +105,6 @@ def main():
     for i, (q, gt) in enumerate(zip(questions, answers)):
         print(f"\n[{i+1}/{len(questions)}] Q: {q[:40]}...")
         
-        # Helper umum untuk evaluasi per metode
         def evaluate_method(method_name, context_docs):
             context_str = build_context(context_docs)
             prompt = f"Context:\n{context_str}\n\nQuestion: {q}\nAnswer in Indonesian based on context."
@@ -124,39 +118,28 @@ def main():
                 "ROUGE-L": score
             })
             print(f"   > {method_name}: {score:.4f}")
-            time.sleep(2) # Delay kecil antar metode
+            time.sleep(2)
 
-        # 1. NAIVE LEXICAL (Old)
         evaluate_method("1. Naive Lexical", retrieve_lexical_only(q, documents, k=K_RETRIEVAL))
 
-        # 2. DENSE (Old)
         evaluate_method("2. Dense (SBERT)", retrieve_documents(q, k=K_RETRIEVAL, lexical_boost=False))
 
-        # 3. HYBRID CUSTOM (Old)
         evaluate_method("3. Hybrid Custom", retrieve_documents(q, k=K_RETRIEVAL, lexical_boost=True))
 
-        # 4. BM25 (New - Better Lexical)
         evaluate_method("4. BM25", retrieve_bm25(q, k=K_RETRIEVAL))
 
-        # 5. HYBRID RRF (New - BM25 + Dense fused)
         evaluate_method("5. Hybrid RRF", retrieve_hybrid_rrf(q, k=K_RETRIEVAL))
 
-        # 6. RE-RANKING (New - Cross Encoder)
         evaluate_method("6. Re-Ranking", retrieve_with_rerank(q, k=K_RETRIEVAL))
 
-        # 7. HyDE (New - Generative)
         hypo_answer = generate_hypothetical_answer(q)
-        # Kita retrieve menggunakan jawaban palsu, bukan pertanyaan
         hyde_docs = retrieve_documents(hypo_answer, k=K_RETRIEVAL, lexical_boost=False)
         evaluate_method("7. HyDE", hyde_docs)
 
-        # 8. MULTI-QUERY (New - Query Expansion)
         variations = generate_multi_queries(q)
         all_docs = []
-        # Retrieve untuk setiap variasi
         for var_q in variations:
             all_docs.extend(retrieve_documents(var_q, k=2, lexical_boost=False)) # Ambil 2 per variasi
-        # Deduplikasi berdasarkan konten teks
         seen = set()
         unique_docs = []
         for doc, score in all_docs:
@@ -165,9 +148,8 @@ def main():
                 seen.add(doc)
         evaluate_method("8. Multi-Query", unique_docs[:K_RETRIEVAL])
 
-        time.sleep(5) # Delay antar pertanyaan
+        time.sleep(5)
 
-    # Summary
     df_res = pd.DataFrame(results)
     print("\n" + "="*50)
     print("RATA-RATA SKOR ROUGE-L PER METODE")

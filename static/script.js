@@ -16,7 +16,6 @@ const renameInput = document.getElementById('rename-input');
 const renameSaveBtn = document.getElementById('rename-save');
 const renameCancelBtn = document.getElementById('rename-cancel');
 
-// Simple multi-chat state (disimpan di localStorage)
 let chats = [];
 let activeChatId = null;
 let renameTargetId = null;
@@ -84,7 +83,6 @@ function renderActiveChat() {
     const current = chats.find(c => c.id === activeChatId);
     if (!current) return;
 
-    // Reset UI
     chatHistory.innerHTML = '';
     if (current.messages.length === 0 && welcomeHero) {
         welcomeHero.style.display = 'block';
@@ -184,14 +182,86 @@ userInput.addEventListener('keydown', function(e) {
     }
 });
 
+function formatMarkdown(text) {
+    if (!text) return '';
+    
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    html = html.replace(/(?:^\s*\*\s+[^\n]*(?:\n|$))+/gm, (match) => {
+        const cleanMatch = match.trim();
+        const items = cleanMatch.split('\n');
+        
+        const listItems = items.map(item => {
+            return '<li>' + item.replace(/^\s*\*\s+/, '').trim() + '</li>';
+        }).join('');
+        
+        return '<ul>' + listItems + '</ul>';
+    });
+
+    const placeholderPrefix = 'ⓅⓁⓐⓒⓔⓗⓞⓛⓓⓔⓡ';
+    const placeholders = [];
+    let placeholderIndex = 0;
+    
+    // Proses Bold (**)
+    html = html.replace(/\*\*([^*\n]+?)\*\*/g, (match, content) => {
+        if (!content.trim()) return match;
+        const placeholder = placeholderPrefix + placeholderIndex++ + 'ⓔⓝⓓ';
+        placeholders.push({ placeholder, replacement: '<strong>' + content + '</strong>' });
+        return placeholder;
+    });
+
+    // Proses Bold dengan Underscore (__)
+    html = html.replace(/__([^_\n]+?)__(?!_)/g, (match, content) => {
+        if (!content.trim()) return match;
+        if (/^MD\d+$/.test(content.trim())) {
+            return match;
+        }
+        const placeholder = placeholderPrefix + placeholderIndex++ + 'ⓔⓝⓓ';
+        placeholders.push({ placeholder, replacement: '<strong>' + content + '</strong>' });
+        return placeholder;
+    });
+    
+    html = html.replace(/\*([^*\n]+?)\*/g, (match, content) => {
+        if (!content.trim()) return match;
+        return '<em>' + content + '</em>';
+    });
+    
+    html = html.replace(/(?<!_)_([^_\n]+?)_(?!_)/g, (match, content) => {
+        if (!content.trim()) return match;
+        return '<em>' + content + '</em>';
+    });
+    
+    placeholders.forEach(({ placeholder, replacement }) => {
+        html = html.split(placeholder).join(replacement);
+    });
+    
+    const remainingPlaceholderPattern = new RegExp(placeholderPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\d+ⓔⓝⓓ', 'g');
+    html = html.replace(remainingPlaceholderPattern, (match) => {
+        console.warn('Unrestored placeholder found:', match);
+        return '';
+    });
+    
+    html = html.replace(/__MD\d+___/g, (match) => {
+        console.warn('Model placeholder found (should have been replaced by model):', match);
+        return '[Nama Mata Kuliah]';
+    });
+    
+    // Ubah newline sisa menjadi <br>
+    html = html.replace(/\n/g, '<br>');
+    
+    return html;
+}
+
 function appendMessage(role, text, save = true) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${role}-message`;
     
     const avatar = role === 'user' ? '👤' : '✨';
     
-    // Convert newlines to <br> for basic formatting, actual markdown parsing would be better
-    const formattedText = text.replace(/\n/g, '<br>');
+    const formattedText = formatMarkdown(text);
 
     msgDiv.innerHTML = `
         <div class="avatar">${avatar}</div>
@@ -205,7 +275,6 @@ function appendMessage(role, text, save = true) {
         const current = chats.find(c => c.id === activeChatId);
         if (current) {
             current.messages.push({ role, text });
-            // Update title berdasarkan pesan user pertama
             if (role === 'user' && !current._hasTitleFromUser) {
                 current.title = text.length > 25 ? text.slice(0, 25) + '…' : text;
                 current._hasTitleFromUser = true;
@@ -241,18 +310,15 @@ async function sendMessage() {
     const text = userInput.value.trim();
     if (!text) return;
 
-    // Sembunyikan hero welcome saat user mulai chat
     if (welcomeHero) {
         welcomeHero.style.display = 'none';
     }
 
-    // Disable input
     userInput.value = '';
     userInput.style.height = 'auto';
     userInput.disabled = true;
     sendBtn.disabled = true;
 
-    // Show user message
     appendMessage('user', text);
     showLoading();
 
@@ -280,7 +346,6 @@ async function sendMessage() {
     }
 }
 
-// Sidebar actions
 if (newChatBtn) {
     newChatBtn.addEventListener('click', () => {
         createNewChat();
@@ -293,7 +358,6 @@ if (sidebarToggle) {
     });
 }
 
-// Rename modal events
 if (renameCancelBtn) {
     renameCancelBtn.addEventListener('click', () => {
         closeRenameModal();
@@ -318,7 +382,6 @@ if (renameInput) {
     });
 }
 
-// Initial load
 loadChats();
 renderChatList();
 renderActiveChat();
