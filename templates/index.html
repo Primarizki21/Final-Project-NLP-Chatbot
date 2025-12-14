@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Akademik</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="app-shell">
+        <!-- Sidebar kiri -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="app-name-group">
+                    <div class="app-name">WaliBot</div>
+                    <div class="app-subtitle">Chatbot Perwakilan Akademik</div>
+                </div>
+                <button class="sidebar-toggle" id="sidebar-toggle" title="Collapse sidebar">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn primary">
+                    <span class="nav-icon">＋</span>
+                    <span>New chat</span>
+                </button>
+            </nav>
+            <div class="chat-list">
+                <div class="chat-list-title">Today</div>
+                <div id="chat-list-items">
+                    <!-- Chat items will be rendered here -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Panel utama -->
+        <main class="main-panel">
+            <header class="main-header">
+                <div class="welcome-hero" id="welcome-hero">
+                    <h1>Hello User!</h1>
+                    <p>How can i help you today?</p>
+                </div>
+            </header>
+
+            <!-- Riwayat chat -->
+            <section class="chat-history" id="chat-history">
+                <!-- Pesan akan ditambahkan di sini oleh JavaScript -->
+            </section>
+
+            <!-- Area input -->
+            <div class="input-wrapper">
+                <div class="input-box">
+                    <textarea id="user-input" placeholder="Send a message..." rows="1"
+                        oninput="autoResize(this)"></textarea>
+                    <button id="send-btn" onclick="sendMessage()">
+                        <span class="send-icon">▶</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Popup rename chat -->
+        <div id="rename-modal" class="rename-overlay" style="display:none;">
+            <div class="rename-dialog">
+                <h3>Rename chat</h3>
+                <input type="text" id="rename-input" placeholder="Chat title" />
+                <div class="rename-actions">
+                    <button type="button" id="rename-cancel">Cancel</button>
+                    <button type="button" id="rename-save" class="primary">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup delete chat -->
+        <div id="delete-modal" class="rename-overlay" style="display:none;">
+            <div class="rename-dialog">
+                <h3>Delete chat?</h3>
+                <p style="margin-bottom: 16px; font-size: 14px; color: #4b5563;">
+                    This will delete <strong id="delete-chat-name"></strong>. This action cannot be undone.
+                </p>
+                <div class="rename-actions">
+                    <button type="button" id="delete-cancel">Cancel</button>
+                    <button type="button" id="delete-confirm" class="primary" style="background-color: #dc2626;">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
