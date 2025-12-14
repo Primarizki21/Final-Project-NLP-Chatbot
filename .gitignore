@@ -7,13 +7,18 @@
 *.xlsx
 *.csv
 
-# File Ground Tru
+# File Ground Truth
 !new_ground_truth_baru.xlsx
 !new_ground_truth.xlsx
 !data.xlsx
 !data_baru.xlsx
 !ground.csv
 !pdf_content.txt
+
+# Folder Templates
+!templates/
+!index.html
+!loading.html
 
 # Nama File
 generate_flowchart_image.py
