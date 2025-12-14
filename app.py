@@ -3,7 +3,6 @@ import google.generativeai as genai
 import threading
 import re
 
-# Import konfigurasi dan retrieval logic
 from config import GEMINI_API_KEY
 from rag_utils_baru import (
     retrieve_documents, 
@@ -14,7 +13,6 @@ from rag_utils_baru import (
 
 app = Flask(__name__)
 
-# Global state for loading
 is_kb_ready = False
 
 def background_loader():
@@ -25,25 +23,19 @@ def background_loader():
     print("[Loader] Knowledge base loaded successfully.")
     is_kb_ready = True
 
-# Start loader thread
 threading.Thread(target=background_loader, daemon=True).start()
 
-# Konfigurasi Gemini jika API key tersedia
 model_gemini = None
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-    # Coba gunakan model terbaru yang stabil (berdasarkan hasil check_models.py)
     try:
-        # Menggunakan gemma-3-27b-it seperti yang diminta
         model_gemini = genai.GenerativeModel('gemma-3-27b-it')
         print("Gemini AI Connected (Model: gemma-3-27b-it).")
     except:
         try:
-            # Fallback ke gemini-flash-latest
             model_gemini = genai.GenerativeModel('gemini-flash-latest')
             print("Gemini AI Connected (Model: gemini-flash-latest).")
         except:
-            # Fallback terakhir
             model_gemini = genai.GenerativeModel('gemini-pro') 
             print("Gemini AI Connected (Model: gemini-pro).")
 else:
@@ -63,24 +55,16 @@ def check_status():
 def chat():
     data = request.json
     user_message = data.get('message', '')
-    history = data.get('history', [])  # Menerima history chat dari frontend
+    history = data.get('history', []) 
 
     if not user_message:
         return jsonify({'response': "Silakan ketik sesuatu."})
 
-    # 1. Retrieve dokumen relevan dari knowledge base (RAG)
-    #    - Prioritas: HyDE (jika tersedia), fallback ke Hybrid Custom
-    #    - Ambil lebih banyak dokumen (k lebih besar)
-    
-    # Check for "Semester X" intent with fuzzy matching for typos (semster, smt, sem)
-    # Matches: semester 5, semster 5, smt 5, sem 5, semester V, etc.
     sem_match = re.search(r'(?:sem[a-z]*|smt)\s*(\d+)', user_message, re.IGNORECASE)
     target_semester = sem_match.group(1) if sem_match else None
     
-    # Increase k if looking for a list
     k_retrieve = 60 if target_semester else 20
     
-    # Coba HyDE terlebih dahulu (jika model Gemini tersedia)
     retrieval_results = []
     use_hyde = False
     
@@ -94,47 +78,32 @@ def chat():
             print(f"[WARNING] HyDE gagal: {e}. Fallback ke Hybrid Custom...")
             retrieval_results = []
     
-    # Fallback ke Hybrid Custom jika HyDE tidak tersedia, gagal, atau return empty
     if not use_hyde or not retrieval_results:
         retrieval_results = retrieve_documents(user_message, k=k_retrieve, lexical_boost=True)
         if not use_hyde:
             print("[RETRIEVAL] Menggunakan Hybrid Custom (Dense + Lexical Boost)")
     
-    # Specialized filtering for "Semester X" queries
     if target_semester:
-        # Prioritize docs that explicitly mention "Semester: X"
         filtered_results = []
         other_results = []
         for doc, score in retrieval_results:
-            # Check strictly for the new format "Semester: X" or padding " | X | "
-            # Also handle if the doc format might differ slightly, but "Semester: 5" is the target from rag_utils
             if f"Semester: {target_semester}" in doc or f" | {target_semester} | " in doc:
                  filtered_results.append((doc, score))
             else:
                  other_results.append((doc, score))
         
-        # Combine: Priority matches first, then others (limited)
         if filtered_results:
-             # If we found strict matches, use them as the primary source
-             # Fill up to 30 with others to ensure we don't miss anything related but differently formatted
              final_results = filtered_results + other_results[:(30 - len(filtered_results))]
              retrieval_results = final_results
         else:
-             # If no strict matches found (maybe knowledge base format is different?), 
-             # try to filter by just the number appearing in the text, but be careful
-             # Fallback: just use the retrieved results but maybe warn/log
              pass
 
-    # Lower threshold to capture relevant docs with lower embedding similarity (e.g. KKN case with score ~0.16)
     retrieved_context = build_context_from_results(retrieval_results, min_score=0.1) 
     high_relevance = any(score > 0.5 for _, score in retrieval_results)
 
-    # 2. Generate Answer menggunakan Gemini (Generator)
     if model_gemini:
         try:
-            # Format history percakapan sebelumnya menjadi string
             history_text = ""
-            # Ambil seluruh history (atau batasi 30-50 terakhir agar tidak overload, tapi cukup untuk mengingat nama)
             for msg in history[-40:]: 
                 role_label = "User" if msg.get('role') == 'user' else "Assistant"
                 history_text += f"{role_label}: {msg.get('text', '')}\n"
@@ -160,20 +129,28 @@ def chat():
             3. If the question asks for a LIST (e.g. "apa saja mata kuliah di semester 1"), combine information from ALL relevant context snippets.
             4. Answer DIRECTLY.
             5. Use Indonesian language (Bahasa Indonesia).
+            6. **FORMATTING:** Use markdown formatting consistently:
+               - Use **bold** (double asterisk) for course names and important terms
+               - Use *italic* (single asterisk) ONLY if needed for emphasis, but be consistent
+               - For lists, use bullet points with "- " or "* " (single asterisk with space) - do NOT use *italic* format for list items
+               - Example: "**Manajemen Jaringan** (SIJ303) - 3 sks" (bold for course name, not italic)
+            7. **CRITICAL - NO PLACEHOLDERS:** 
+               - ALWAYS use the actual course names from the context. DO NOT use placeholders like __MD0___, __MD1___, etc.
+               - If you see course information in the context, extract and use the REAL course name (e.g., "Manajemen Jaringan", "Multivariat", "Data Mining II")
+               - Format: "* **Course Name** (CODE) - X sks" for list items
+               - Example: "* **Manajemen Jaringan** (SIJ303) - 3 sks" NOT "* __MD0___ (SIJ303) - 3 sks"
             """
 
             response = model_gemini.generate_content(prompt)
             return jsonify({'response': response.text})
 
         except Exception as e:
-            print(f"Gemini Error Detail: {e}") # Print detailed error to terminal
+            print(f"Gemini Error Detail: {e}")
             import traceback
             traceback.print_exc() # Print full stack trace
             return jsonify({'response': f"Maaf, ada kesalahan teknis: {str(e)}"})
 
-    # 3. Fallback if No API Key (Limited Logic)
     else:
-        # Jika tidak ada API key, gunakan jawaban dari dokumen paling relevan saja
         if high_relevance:
             best_doc, _ = retrieval_results[0]
             return jsonify({'response': f"**Info Kampus:**\n{best_doc}\n\n*(Mode terbatas: Pasang API Key untuk fitur tanya jawab bebas)*"})
