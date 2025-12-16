@@ -1,291 +1,161 @@
 import pandas as pd
-import numpy as np
 import time
-import torch
-import google.generativeai as genai
-from sentence_transformers import util
-from config import GEMINI_API_KEY
-from rank_bm25 import BM25Okapi
-import rag_utils_baru as rag
-from rag_utils_baru import (
-    retrieve_documents,
-    retrieve_bm25,
-    retrieve_hybrid_rrf,
-    retrieve_with_rerank,
-    get_embedder,
-    get_documents_and_embeddings
-)
+import os
+import numpy as np
+from rag_utils_baru import RetrievalSystem
 
-GT_PATH = "new_ground_truth_baru.xlsx" 
-OUTPUT_FILE = "hasil_evaluasi_retrieval_detail.xlsx"
+# --- KONFIGURASI ---
+DATA_FILE = "data_baru.xlsx"
+GT_FILE = "new_ground_truth_baru.xlsx"
+OUTPUT_FILE = "hasil_evaluasi_lengkap.xlsx" # Ganti nama file biar fresh
+METHODS = ['bm25', 'tfidf_sum', 'jaccard', 'vsm_cosine']
+K_VALUES = [1, 3, 5, 10]
 
-K_VALUES = [1, 3, 5, 10, 20]
-RELEVANCE_THRESHOLD = 0.6 
+def parse_target_ids(raw_val):
+    str_val = str(raw_val).strip()
+    if '.' in str_val and ',' not in str_val:
+        str_val = str_val.replace('.', ',')
 
-model_gen = None
-if GEMINI_API_KEY and GEMINI_API_KEY != "MASUKKAN_API_KEY_ANDA":
-    try:
-        genai.configure(api_key=GEMINI_API_KEY)
-        model_gen = genai.GenerativeModel("gemma-3-27b-it")
-        print("[INIT] Gemini model loaded: gemma-3-27b-it")
-    except Exception as e:
-        print(f"[WARNING] Gagal load Gemini model: {e}")
+    # Hapus suffix .0 standar (misal 4.0 -> 4)
+    if str_val.endswith('.0'):
+        str_val = str_val[:-2]
 
-def calculate_metrics(retrieved_docs, ground_truth_answer, embedder):
-    """Cek relevansi menggunakan semantic similarity."""
-    if not retrieved_docs or not ground_truth_answer:
-        return 0.0, 0
-
-    # Pastikan input string
-    ground_truth_answer = str(ground_truth_answer)
+    parts = str_val.split(',')
     
-    gt_emb = embedder.encode(ground_truth_answer, convert_to_tensor=True)
-    relevant_count = 0
-    is_hit = False 
-    
-    for doc_text, _ in retrieved_docs:
-        doc_emb = embedder.encode(doc_text, convert_to_tensor=True)
-        sim_score = util.cos_sim(gt_emb, doc_emb).item()
-        
-        if sim_score >= RELEVANCE_THRESHOLD:
-            relevant_count += 1
-            is_hit = True
+    clean_ints = []
+    for p in parts:
+        p = p.strip()
+        # Bersihkan lagi jika ada sisa .0 di setiap bagian
+        if p.endswith('.0'):
+            p = p[:-2]
             
-    precision = relevant_count / len(retrieved_docs) if retrieved_docs else 0.0
-    recall_hit = 1 if is_hit else 0
-    return precision, recall_hit
-
-def generate_hyde(query):
-    if not model_gen: return query
-    try:
-        res = model_gen.generate_content(f"Tuliskan jawaban singkat hipotetis untuk: {query}")
-        return res.text.strip()
-    except: return query
-
-def generate_multiquery(query):
-    if not model_gen: return [query]
-    try:
-        res = model_gen.generate_content(f"Buat 3 variasi pertanyaan dari: {query}")
-        lines = [x.strip() for x in res.text.split('\n') if x.strip()]
-        return lines[:3]
-    except: return [query]
+        if p: # Jika tidak kosong
+            try:
+                # KONVERSI KE INTEGER
+                val_int = str(p)
+                clean_ints.append(val_int)
+            except ValueError:
+                pass 
+                
+    return clean_ints
 
 def main():
-    print("\n=== EVALUASI RETRIEVAL: 8 METODE ===")
-    
-    rag._documents = []
-    rag._doc_embeddings = None
-    rag._bm25_model = None
-    
+    # 1. Cek Path File Output (Untuk debugging file tidak ketemu)
+    abs_output_path = os.path.abspath(OUTPUT_FILE)
+    print(f"[INFO] File output nanti akan disimpan di:\n -> {abs_output_path}\n")
+
+    # 2. Inisialisasi Engine
     try:
-        print(f"[INIT] Membaca Ground Truth dari: {GT_PATH}...")
-        df_gt = pd.read_excel(GT_PATH)
-        
-        print(f"[DEBUG] Kolom yang ditemukan: {list(df_gt.columns)}")
-        
-        cols = {c.lower(): c for c in df_gt.columns}
-        q_col = cols.get('question') or cols.get('pertanyaan') or cols.get('query')
-        a_col = cols.get('answer') or cols.get('jawaban') or cols.get('response')
-        
-        source_id_col = cols.get('source_id')
-        source_title_col = cols.get('source_title')
-        source_section_col = cols.get('source_section')
-        source_type_col = cols.get('source_type')
-        
-        if not q_col or not a_col:
-            print(f"Error: Kolom pertanyaan/jawaban tidak ditemukan.")
-            print(f"Kolom yang tersedia: {list(df_gt.columns)}")
-            print(f"Mencoba menggunakan kolom pertama dan kedua...")
-            if len(df_gt.columns) >= 2:
-                q_col = df_gt.columns[0]
-                a_col = df_gt.columns[1]
-            else:
-                return
-
-        questions = df_gt[q_col].dropna().tolist()
-        answers = df_gt[a_col].dropna().tolist()
-        
-        if source_id_col:
-            source_ids = df_gt[source_id_col].dropna().tolist()
-            print(f"[INFO] Ground truth memiliki {len([s for s in source_ids if pd.notna(s)])} referensi source_id")
-        
-        LIMIT = 100
-        questions = questions[:LIMIT]
-        answers = answers[:LIMIT]
-        print(f"[INIT] Siap mengevaluasi {len(questions)} pertanyaan.")
-        print(f"[INFO] Tujuan evaluasi: Mengukur apakah retrieval berhasil menemukan dokumen relevan")
-
+        engine = RetrievalSystem(DATA_FILE)
     except Exception as e:
-        print(f"FATAL: Gagal baca file GT ({GT_PATH}): {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"[STOP] Error init: {e}")
         return
 
-    print("[INIT] Loading Knowledge Base dari data_baru.xlsx...")
-    embedder = get_embedder()
-    
-    get_documents_and_embeddings(exclude_ground_truth=False)
-    
-    if not rag._documents:
-        print("ERROR: Dokumen kosong! Pastikan file 'data_baru.xlsx' ada di folder.")
+    # 3. Load Ground Truth
+    print(f"[EVAL] Membaca GT dari {GT_FILE}...")
+    try:
+        df_gt = pd.read_excel(GT_FILE, sheet_name="GT", dtype=str)
+    except Exception as e:
+        print(f"[STOP] Gagal baca GT: {e}")
         return
-    else:
-        print(f"[INIT] Berhasil memuat {len(rag._documents)} dokumen dari knowledge base.")
-
+        
     all_results = []
-    
-    # 4. MULAI LOOP EVALUASI
-    print(f"\n[EVAL] Memulai evaluasi dengan k values: {K_VALUES}")
-    print(f"[EVAL] Total pertanyaan: {len(questions)}")
-    print(f"[EVAL] Total metode: 8")
-    print(f"[EVAL] Total kombinasi: {len(questions)} x 8 x {len(K_VALUES)} = {len(questions) * 8 * len(K_VALUES)}\n")
-    
-    for i, (q, gt) in enumerate(zip(questions, answers)):
-        q = str(q)
-        gt = str(gt)
+    total_data = len(df_gt)
+
+    # 4. Loop Evaluasi
+    for i, row in df_gt.iterrows():
+        query = str(row['question'])
+        target_type = str(row['source_type']).strip()
+        target_ids_list = parse_target_ids(row['source_id'])
         
-        print(f"\n[{i+1}/{len(questions)}] Question: {q[:60]}...")
-        
-        def save_result(method_name, k_value, retrieved_data, precision, recall_hit):
-            """Simpan hasil evaluasi untuk satu metode dan satu nilai k"""
-            top_doc = retrieved_data[0][0] if retrieved_data else "NO RESULT"
-            top_score = retrieved_data[0][1] if retrieved_data else 0.0
+        # Jumlah dokumen relevan yang tersedia (untuk penyebut Recall)
+        total_relevant = len(target_ids_list) 
+        if total_relevant == 0: continue # Skip jika tidak ada kunci jawaban
+
+        print(f"\n[{i+1}/{total_data}] Q: {query[:40]}...")
+        print(f"   -> TARGET: {target_ids_list} (Type: {target_type})")
+
+        for method in METHODS:
+            start_time = time.time()
             
-            all_results.append({
-                "Method": method_name,
-                "K": k_value,
-                "Question": q,
-                "Ground Truth": gt,
-                "Top-1 Retrieved": top_doc[:300], 
-                "Top Score": top_score,
-                "Precision": precision,
-                "Recall (Hit)": recall_hit
-            })
+            # Retrieve max K
+            retrieved = engine.search(query, method, top_k=max(K_VALUES))
+            duration = time.time() - start_time
+            
+            # --- ANALISIS HASIL RETRIEVAL ---
+            retrieved_ids_debug = []  # Untuk laporan excel
+            matches_vector = []       # [1, 0, 1, ...]
+            
+            for doc in retrieved:
+                doc_id = str(doc['source_id'])
+                doc_type = str(doc['source_type'])
+                
+                # Simpan info dokumen yang terambil
+                retrieved_ids_debug.append(f"{doc_id}")
+                
+                # Cek Relevansi (ID ada di target DAN Tipe Sheet sama)
+                is_match = (doc_type == target_type) and (doc_id in target_ids_list)
+                matches_vector.append(1 if is_match else 0)
+            
+            # Print debug singkat ke layar (hanya top 5 biar ga spam)
+            top_retrieved_str = ", ".join(retrieved_ids_debug[:5])
+            print(f"   [{method}] Found: [{top_retrieved_str}...] | Matches: {sum(matches_vector)}")
 
-        kb_docs = rag._documents 
-        q_set = set(q.lower().split())
-        lex_scores = []
-        for d in kb_docs:
-            d_set = set(d.lower().split())
-            sc = len(q_set & d_set) / len(q_set) if q_set else 0
-            lex_scores.append((d, sc))
-        lex_scores_sorted = sorted(lex_scores, key=lambda x:x[1], reverse=True)
-        
-        for k in K_VALUES:
-            retrieved = lex_scores_sorted[:k]
-            prec, hit = calculate_metrics(retrieved, gt, embedder)
-            save_result("1. Naive Lexical", k, retrieved, prec, hit)
-
-        for k in K_VALUES:
-            retrieved = retrieve_documents(q, k=k, lexical_boost=False)
-            prec, hit = calculate_metrics(retrieved, gt, embedder)
-            save_result("2. Dense", k, retrieved, prec, hit)
-
-        for k in K_VALUES:
-            retrieved = retrieve_documents(q, k=k, lexical_boost=True)
-            prec, hit = calculate_metrics(retrieved, gt, embedder)
-            save_result("3. Hybrid Custom", k, retrieved, prec, hit)
-
-        for k in K_VALUES:
-            retrieved = retrieve_bm25(q, k=k)
-            prec, hit = calculate_metrics(retrieved, gt, embedder)
-            save_result("4. BM25", k, retrieved, prec, hit)
-
-        for k in K_VALUES:
-            retrieved = retrieve_hybrid_rrf(q, k=k)
-            prec, hit = calculate_metrics(retrieved, gt, embedder)
-            save_result("5. Hybrid RRF", k, retrieved, prec, hit)
-
-        for k in K_VALUES:
-            fetch_k = max(k * 2, 20)
-            retrieved = retrieve_with_rerank(q, k=k, fetch_k=fetch_k)
-            prec, hit = calculate_metrics(retrieved, gt, embedder)
-            save_result("6. Re-Ranking", k, retrieved, prec, hit)
-
-        if model_gen:
-            hyde_q = generate_hyde(q)
-            for k in K_VALUES:
-                retrieved = retrieve_documents(hyde_q, k=k, lexical_boost=False)
-                prec, hit = calculate_metrics(retrieved, gt, embedder)
-                save_result("7. HyDE", k, retrieved, prec, hit)
-        else:
-            for k in K_VALUES:
-                all_results.append({
-                    "Method": "7. HyDE",
-                    "K": k,
-                    "Question": q,
-                    "Ground Truth": gt,
-                    "Top-1 Retrieved": "SKIPPED (No API Key)",
-                    "Top Score": 0.0,
-                    "Precision": 0.0,
-                    "Recall (Hit)": 0
-                })
-
-        if model_gen:
-            qs = generate_multiquery(q)
-            combined = []
-            for sub_q in qs:
-                combined.extend(retrieve_documents(sub_q, k=max(K_VALUES), lexical_boost=False))
-            seen, unique = set(), []
-            for d, s in combined:
-                if d not in seen:
-                    unique.append((d, s))
-                    seen.add(d)
-            unique.sort(key=lambda x:x[1], reverse=True)
+            # --- HITUNG METRICS (Precision & Recall) ---
+            res_row = {
+                'No': i+1,
+                'Question': query,
+                'Target Type': target_type,
+                'Total Relevant (Ground Truth)': total_relevant,
+                'Target IDs': target_ids_list,
+                'Method': method,
+                'Retrieved IDs (Top-K)': ", ".join(retrieved_ids_debug), # Ini yang kamu minta
+                'Time': duration
+            }
             
             for k in K_VALUES:
-                retrieved = unique[:k]
-                prec, hit = calculate_metrics(retrieved, gt, embedder)
-                save_result("8. Multi-Query", k, retrieved, prec, hit)
-        else:
-            for k in K_VALUES:
-                all_results.append({
-                    "Method": "8. Multi-Query",
-                    "K": k,
-                    "Question": q,
-                    "Ground Truth": gt,
-                    "Top-1 Retrieved": "SKIPPED (No API Key)",
-                    "Top Score": 0.0,
-                    "Precision": 0.0,
-                    "Recall (Hit)": 0
-                })
-        
-        if (i + 1) % 10 == 0:
-            print(f"[PROGRESS] Selesai {i+1}/{len(questions)} pertanyaan...")
+                # Ambil irisan k pertama
+                current_matches = matches_vector[:k]
+                relevant_retrieved = sum(current_matches) # Jumlah dokumen relevan yang ditemukan di top K
+                
+                # Precision@K: (Relevan di Top K) / K
+                precision = relevant_retrieved / k
+                
+                # Recall@K: (Relevan di Top K) / (Total Dokumen Relevan di Database)
+                recall = relevant_retrieved / total_relevant if total_relevant > 0 else 0
+                
+                res_row[f'Precision@{k}'] = precision
+                res_row[f'Recall@{k}'] = recall
+            
+            all_results.append(res_row)
 
-    print("\n" + "="*80)
-    print("ANALISIS HASIL EVALUASI")
-    print("="*80)
-    
+    # 5. Simpan Hasil
+    print("\n[EVAL] Menyimpan laporan...")
+    if not all_results:
+        print("[ERROR] Tidak ada hasil yang diproses. Cek nama sheet/kolom di excel.")
+        return
+
     df_res = pd.DataFrame(all_results)
     
-    print("\n--- AVERAGE PRECISION PER METODE DAN PER K ---")
-    summary_k = df_res.groupby(["Method", "K"])[["Precision", "Recall (Hit)"]].mean().reset_index()
-    summary_k = summary_k.pivot(index="Method", columns="K", values="Precision")
-    print(summary_k.round(4))
+    # Buat Summary Rata-rata
+    metric_cols = [f'Precision@{k}' for k in K_VALUES] + [f'Recall@{k}' for k in K_VALUES]
+    summary = df_res.groupby('Method')[metric_cols].mean()
     
-    print("\n--- AVERAGE PRECISION PER METODE (Rata-rata semua K) ---")
-    summary_method = df_res.groupby("Method")[["Precision", "Recall (Hit)"]].mean().reset_index()
-    summary_method = summary_method.sort_values("Precision", ascending=False)
-    print(summary_method.round(4))
-    
-    print("\n--- AVERAGE PRECISION PER K (Rata-rata semua Metode) ---")
-    summary_k_avg = df_res.groupby("K")[["Precision", "Recall (Hit)"]].mean().reset_index()
-    print(summary_k_avg.round(4))
-    
-    print(f"\n[SAVE] Menyimpan hasil detail ke: {OUTPUT_FILE}")
-    df_res.to_excel(OUTPUT_FILE, index=False)
-    
-    summary_file = OUTPUT_FILE.replace(".xlsx", "_summary.xlsx")
-    with pd.ExcelWriter(summary_file, engine='openpyxl') as writer:
-        summary_method.to_excel(writer, sheet_name="Avg Per Method", index=False)
-        summary_k_avg.to_excel(writer, sheet_name="Avg Per K", index=False)
-        summary_k.to_excel(writer, sheet_name="Precision Matrix")
-    
-    print(f"[SAVE] Menyimpan summary ke: {summary_file}")
-    print("\n" + "="*80)
-    print("EVALUASI SELESAI!")
-    print("="*80)
+    try:
+        with pd.ExcelWriter(OUTPUT_FILE, mode='w') as writer:
+            df_res.to_excel(writer, sheet_name='Detail', index=False)
+            summary.to_excel(writer, sheet_name='Summary')
+        print(f"\n[SUKSES] File tersimpan di: {abs_output_path}")
+        print("Silakan buka file tersebut untuk melihat detail Retrieved ID.")
+        
+    except PermissionError:
+        print(f"\n[ERROR] File '{OUTPUT_FILE}' sedang dibuka di Excel!")
+        print("Tutup file Excel tersebut lalu jalankan ulang script ini.")
+    except Exception as e:
+        print(f"\n[ERROR] Gagal menyimpan file: {e}")
+
+    print("\n=== HASIL RATA-RATA ===")
+    print(summary)
 
 if __name__ == "__main__":
     main()
